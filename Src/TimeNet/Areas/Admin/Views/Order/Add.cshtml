@@ -1,0 +1,505 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var version = Guid.NewGuid;
+}
+<title>@SharedResources["Orders"] / @SharedResources["Add new"]</title>
+<style>
+    .height-5 {
+        height: 5px;
+        min-height: 5px;
+        padding: 0;
+    }
+
+    .item-group {
+        border-radius: 4px;
+    }
+
+        .item-group :hover {
+            background: #F7F7F9;
+        }
+</style>
+<div ng-controller="AddOrderController" ng-init="init()">
+    <form id="addOrderform" name="addOrderform" ng-submit="addOrder(false)">
+        <div class="page-header">
+            <div>
+                <h2 class="main-content-title tx-24 mg-b-5">@SharedResources["Manage orders"]</h2>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">@SharedResources["Orders"]</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@SharedResources["Add new"]</li>
+                </ol>
+            </div>
+            <div class="d-flex">
+                <div class="justify-content-center">
+                    <a href="/admin/order" class="btn btn-danger">@SharedResources["Cancel"]</a>
+                    <button type="submit" class="btn btn-primary my-2 btn-icon-text">
+                        <i class="fe fe-save me-2"></i> @SharedResources["Save"]
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-sm">
+            <div class="col-lg-7 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <label class="main-content-label">@SharedResources["Products"]</label>
+                            <button ng-click="addOrderItems()" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-plus me-2"></i> @SharedResources["Add product"]
+                            </button>
+                        </div>
+
+                        <div ng-show="order.orderItems && order.orderItems.length > 0" class="table-responsive mg-t-40">
+                            <table class="table table-invoice table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="wd-lg-50p">@SharedResources["Product"]</th>
+                                        <th class="wd-lg-20p tx-center">@SharedResources["Quantity"]</th>
+                                        <th class="tx-right">@SharedResources["Price"]</th>
+                                        <th class="tx-right">@SharedResources["Amount"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in order.orderItems">
+                                        <td class="d-flex align-items-center" style="border: none !important;">
+                                            <img alt="avatar" class="me-2" src="{{convertToUrlImage(item.pictureThumbnailUrl)}}" style="height: 40px;">
+                                            <div class="d-inline-block">
+                                                <h6 class="mb-1" style="color: #1d212f;">{{item.productName}}</h6>
+                                                <p class="mb-0 tx-13 text-muted">{{getVariant(item.attributes)}}</p>
+                                            </div>
+                                            <i class="ti ti-trash text-danger ms-auto cursor-pointer" ng-click="deleteOrderItem(item.id)"></i>
+                                        </td>
+                                        <td class="tx-center">
+                                            <p>{{item.quantity}}</p>
+                                        </td>
+                                        <td class="tx-right">
+                                            <p>{{item.priceInclTax}}</p>
+                                        </td>
+                                        <td class="tx-right"> <p>{{item.priceInclTax * item.quantity}}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" rowspan="4" style="vertical-align: top;">
+                                            <div>
+                                                <div class="d-flex">
+                                                    <label class="main-content-label tx-13">@SharedResources["Notes"]</label>
+                                                    <div class="ms-auto d-flex">
+                                                        <div class="me-3 d-flex text-muted tx-13">
+                                                            <i class="ti ti-pencil" ng-show="!editNote" ng-click="editNote = !editNote"></i>
+                                                            <i class="ti ti-close" ng-show="editNote" ng-click="editNote = !editNote"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p ng-show="!editNote">{{order.note}}</p>
+                                            </div>
+                                            <textarea ng-show="editNote" class="form-control" ng-model="order.note" rows="5" placeholder="@SharedResources["Notes"]"></textarea>
+                                        </td>
+                                        <td class="tx-right">@SharedResources["Sub total"]</td>
+                                        <td class="tx-right" colspan="2">{{order.orderSubtotalInclTax}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tx-right">@SharedResources["Tax"]</td>
+                                        <td class="tx-right" colspan="2">0%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tx-right">@SharedResources["Discount"]</td>
+                                        <td class="tx-right" colspan="2">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tx-right tx-uppercase tx-bold tx-inverse">@SharedResources["Total"]</td>
+                                        <td class="tx-right" colspan="2">
+                                            <h4 class="tx-bold">{{order.orderSubtotalInclTax}}</h4>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div ng-show="!order.orderItems || order.orderItems.length < 1" class="row row-sm justify-content-center align-items-center" style="color: #E5EAEF; padding: 30px 0; padding: 30px 0;">
+                            <svg height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" viewBox="0 0 24 24">
+                                <g fill="currentColor">
+                                    <path d="M8.422 20.618C10.178 21.54 11.056 22 12 22V12L2.638 7.073a3.196 3.196 0 0 0-.04.067C2 8.154 2 9.417 2 11.942v.117c0 2.524 0 3.787.597 4.801c.598 1.015 1.674 1.58 3.825 2.709l2 1.05Z"></path>
+                                    <path d="m17.577 4.432l-2-1.05C13.822 2.461 12.944 2 12 2c-.945 0-1.822.46-3.578 1.382l-2 1.05C4.318 5.536 3.242 6.1 2.638 7.072L12 12l9.362-4.927c-.606-.973-1.68-1.537-3.785-2.641Z" opacity=".7"></path>
+                                    <path d="M21.403 7.14a3.153 3.153 0 0 0-.041-.067L12 12v10c.944 0 1.822-.46 3.578-1.382l2-1.05c2.151-1.129 3.227-1.693 3.825-2.708c.597-1.014.597-2.277.597-4.8v-.117c0-2.525 0-3.788-.597-4.802Z" opacity=".5"></path>
+                                    <path d="m6.323 4.484l.1-.052l1.493-.784l9.1 5.005l4.025-2.011c.137.155.257.32.362.498c.15.254.262.524.346.825L17.75 9.964V13a.75.75 0 0 1-1.5 0v-2.286l-3.5 1.75v9.44A3.062 3.062 0 0 1 12 22c-.248 0-.493-.032-.75-.096v-9.44l-8.998-4.5c.084-.3.196-.57.346-.824a3.15 3.15 0 0 1 .362-.498l9.04 4.52l3.386-1.693l-9.063-4.985Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <label class="main-content-label">@SharedResources["Order status"]</label>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="name">
+                                @SharedResources["Shipping status"]
+                            </label>
+                            <select class="form-control select2" ng-model="order.shippingStatus">
+                                <option ng-repeat="option in shippingStatuses" value="{{option.id}}" ng-bind="option.name"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">
+                                @SharedResources["Payment status"]
+                            </label>
+                            <select class="form-control select2" ng-model="order.paymentStatus">
+                                <option ng-repeat="option in paymentStatuses" value="{{option.id}}" ng-bind="option.name"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <label class="main-content-label">@SharedResources["Customer"]</label>
+                            <button ng-click="addCustomer()" ng-show="order.customer" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-pencil me-2"></i> @SharedResources["Edit"]
+                            </button>
+                            <button ng-click="addCustomer()" ng-show="!order.customer" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-search me-2"></i> @SharedResources["Search"]
+                            </button>
+                        </div>
+                        <div ng-show="!order.customer" class="row row-sm justify-content-center align-items-center" style="color: #E5EAEF; padding: 30px 0;">
+                            <svg height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="15" cy="6" r="3" opacity=".4"></circle><ellipse cx="16" cy="17" opacity=".4" rx="5" ry="3"></ellipse><circle cx="9.001" cy="6" r="4"></circle><ellipse cx="9.001" cy="17.001" rx="7" ry="4"></ellipse></g></svg>
+                        </div>
+                        <div ng-show="order.customer">
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["First name"]:  {{order.customer.firstName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Last name"]:  {{order.customer.lastName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Email"] :
+                                </h5>
+                                <h5 class="tx-15 my-auto ms-1">
+                                    <a href="{{'/admin/user/update/' + order.customer.id}}" target="_blank">{{order.customer.email}}</a>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <label class="main-content-label">@SharedResources["Shipping address"]</label>
+                            <button ng-click="openAddOrUpdateAddressModal('shippingAddress')" ng-show="order.shippingAddress" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-pencil me-2"></i> @SharedResources["Edit"]
+                            </button>
+                            <button ng-click="openAddOrUpdateAddressModal('shippingAddress')" ng-show="!order.shippingAddress" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-plus me-2"></i> @SharedResources["Add new"]
+                            </button>
+                        </div>
+                        <div ng-show="!order.shippingAddress" class="row row-sm justify-content-center align-items-center" style="color: #E5EAEF; padding: 30px 0;">
+                            <svg height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" viewBox="0 0 24 24">
+                                <g fill="currentColor">
+                                    <path d="M2 12.204c0-2.289 0-3.433.52-4.381c.518-.949 1.467-1.537 3.364-2.715l2-1.241C9.889 2.622 10.892 2 12 2c1.108 0 2.11.622 4.116 1.867l2 1.241c1.897 1.178 2.846 1.766 3.365 2.715c.519.948.519 2.092.519 4.38v1.522c0 3.9 0 5.851-1.172 7.063C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.212C2 19.576 2 17.626 2 13.725v-1.521Z" opacity=".5"></path>
+                                    <path d="M11.25 18a.75.75 0 0 0 1.5 0v-3a.75.75 0 0 0-1.5 0v3Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div ng-show="order.shippingAddress">
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["First name"]:  {{order.shippingAddress.firstName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Last name"]:  {{order.shippingAddress.lastName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Email"]:  {{order.shippingAddress.email}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Phone number"]:  {{order.shippingAddress.phoneNumber}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Country"]:  {{order.shippingAddress.countryId}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["City"]:  {{order.shippingAddress.city}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Address"] 1:  {{order.shippingAddress.address1}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Address"] 2:  {{order.shippingAddress.address2}}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <label class="main-content-label">@SharedResources["Billing address"]</label>
+                            <button ng-click="openAddOrUpdateAddressModal('billingAddress')" ng-show="order.billingAddress" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-pencil me-2"></i> @SharedResources["Edit"]
+                            </button>
+                            <button ng-click="openAddOrUpdateAddressModal('billingAddress')" ng-show="!order.billingAddress" type="button" class="btn btn-icon-text ms-auto height-5">
+                                <i class="ti ti-plus me-2"></i> @SharedResources["Add new"]
+                            </button>
+                        </div>
+                        <label ng-show="order.shippingAddress" class="custom-switch mb-2">
+                            <input type="checkbox"
+                                   name="custom-switch-checkbox" class="custom-switch-input" ng-model="order.useShippingAddress" ng-change="useShippingAddressOnChange()">
+                            <span class="custom-switch-indicator"></span> <span class="custom-switch-description">
+                                @SharedResources["Use shipping address"]
+                            </span>
+                        </label>
+                        <div ng-show="!order.billingAddress" class="row row-sm justify-content-center align-items-center" style="color: #E5EAEF; padding: 30px 0;">
+                            <svg height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" viewBox="0 0 24 24">
+                                <g fill="currentColor">
+                                    <path d="M2 12.204c0-2.289 0-3.433.52-4.381c.518-.949 1.467-1.537 3.364-2.715l2-1.241C9.889 2.622 10.892 2 12 2c1.108 0 2.11.622 4.116 1.867l2 1.241c1.897 1.178 2.846 1.766 3.365 2.715c.519.948.519 2.092.519 4.38v1.522c0 3.9 0 5.851-1.172 7.063C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.212C2 19.576 2 17.626 2 13.725v-1.521Z" opacity=".5"></path>
+                                    <path d="M11.25 18a.75.75 0 0 0 1.5 0v-3a.75.75 0 0 0-1.5 0v3Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div ng-show="order.billingAddress">
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["First name"]:  {{order.billingAddress.firstName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Last name"]:  {{order.billingAddress.lastName}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Email"]:  {{order.billingAddress.email}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Phone number"]:  {{order.billingAddress.phoneNumber}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Country"]:  {{order.billingAddress.countryId}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["City"]:  {{order.billingAddress.city}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Address"] 1:  {{order.billingAddress.address1}}
+                                </h5>
+                            </div>
+                            <div class="d-flex mb-2">
+                                <h5 class="tx-15 my-auto text-muted font-weight-normal">
+                                    @SharedResources["Address"] 2:  {{order.billingAddress.address2}}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!--Modal Customer-->
+    <div class="modal fade" id="modal-customer">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">@SharedResources["Customer"]</h6>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="customerSearchText" placeholder="@SharedResources["Search"] @SharedResources["Customer"]" ng-change="searchOnChange()">
+                    </div>
+                    <div class="scrollable overflow-auto p-2" style="max-height: 400px;">
+                        <div ng-repeat="customer in customers" ng-click="selectCustomer(customer.id)" class="item-group justify-content-center align-items-center cursor-pointer">
+                            <div class="d-flex py-2 px-1">
+                                <img alt="avatar" class="rounded-circle me-2" src="/admin/assets/img/users/5.jpg" style="height: 40px;" ng-show="customer.avatar">
+                                <div class="avatar bg-info me-2" ng-show="!customer.avatar">{{customer.firstName.substr(0, 1).toUpperCase() + customer.lastName.substr(0, 1).toUpperCase()}}</div>
+                                <div class="d-inline-block">
+                                    <h6 class="mb-1">{{customer.firstName}}  {{customer.lastName}}</h6>
+                                    <p class="mb-0 tx-13 text-muted">{{customer.email}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn ripple btn-primary" ng-click="createNewCustomer()" type="button">
+                        @SharedResources["Create new customer"]
+                    </button>
+                    <button class="btn ripple btn-danger" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Cancel"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Modal Customer-->
+
+    <!--Modal Add or update Address-->
+    <div class="modal fade" id="modal-add-or-update-address">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">
+                        {{addOrUpdateAddress.type === 'shippingAddress' ? '@SharedResources["Shipping address"]' : '@SharedResources["Billing address"]'}}
+                    </h6>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">@SharedResources["First name"]</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.firstName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Last name"]</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.lastName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Phone number"]</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.phoneNumber">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Email"]</label>
+                        <input type="email" class="form-control" ng-model="addOrUpdateAddress.email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Country"]</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.countryId">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["City"]</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.city">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Address"] 1</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.address1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">@SharedResources["Address"] 2</label>
+                        <input type="text" class="form-control" ng-model="addOrUpdateAddress.address2">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button ng-click="saveAddress()" class="btn ripple btn-primary" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Save"]
+                    </button>
+                    <button class="btn ripple btn-danger" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Cancel"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Modal Add or update Address-->
+    <!--Modal Product Item-->
+    <div class="modal fade" id="modal-add-order-items">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">@SharedResources["Product"]</h6>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="position-relative">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="productSearchText" placeholder="@SharedResources["Search"]" ng-change="productSearchTextOnChange()">
+                        </div>
+
+                        <div class="position-absolute top-100 start-0" style="width: 100%; z-index: 9;background: #fff;">
+                            <div class="scrollable overflow-auto p-2" style="max-height: 300px;">
+                                <div ng-repeat="product in products" ng-click="addOrderItem(product.id)" class="item-group justify-content-center align-items-center cursor-pointer">
+                                    <div class="d-flex py-2 px-1">
+                                        <img alt="avatar" class="me-2" src="{{convertUrlImage(product.images[0])}}" style="height: 40px;">
+                                        <div class="d-inline-block">
+                                            <h6 class="mb-1">{{product.name}}</h6>
+                                            <p class="mb-0 tx-13 text-muted">{{product.price}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="currentItem && currentItem.productId">
+                            <div class="form-group">
+                                <label>@SharedResources["Quantity"]</label>
+                                <input type="number" min="1" class="form-control" ng-model="currentItem.quantity">
+                            </div>
+                            <div ng-show="currentItem && currentItem.attributes">
+                                <div ng-repeat="attribute in currentItem.attributes" class="row row-sm justify-content-center align-items-center mt-4">
+                                    <div class="form-group">
+                                        <label>{{attribute.name}}</label>
+                                        <select class="form-control select2" ng-model="currentItem[attribute.name]">
+                                            <option ng-repeat="value in attribute.values" value="{{value}}" ng-bind="value"></option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn ripple btn-primary" ng-click="saveOrderItem()" type="button">
+                        @SharedResources["Save"]
+                    </button>
+                    <button class="btn ripple btn-danger" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Cancel"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Modal Product Item-->
+</div>
+
+@section Scripts
+{
+    <script src="~/plugins/summernote-editor/summernote1.js"></script>
+    <script src="~/plugins/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
+
+    <script src="~/admin/assets/js/services/CommonService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/OrderService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/UserService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/ProductService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/controllers/order/AddOrderController.js?v=@version"></script>
+}

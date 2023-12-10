@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@model Time.Commerce.Contracts.Models.Identity.LoginCookiesModel
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    var returnUrl = @Context.Request.Query["returnurl"];
+}
+<style>
+    .input-customize {
+        height: 60px !important;
+        padding: 0 30px !important;
+        color: var(--color-body) !important;
+    }
+
+    .sign-in-form {
+        min-height: 800px;
+        align-items: center;
+    }
+
+    .primary-tex-btn{
+        font-size: 14px;
+        color: var(--color-primary);
+        transition: var(--transition);
+    }
+</style>
+<div class="wrapper vcenter-item">
+    <div class="box">
+        <div class="container">
+            <div class="row justify-content-center sign-in-form">
+                <div class="col-md-7 col-lg-5">
+                    <div class="wrap">
+                        <div class="justify-content-center">
+                            <h3 class="title">@SharedResources["Sign up"]</h3>
+                            <form asp-controller="Account" asp-action="Signup" asp-route-returnurl="@returnUrl" method="post">
+                                <div class="form-group">
+                                    <label>@SharedResources["First name"]</label>
+                                    <input class="form-control input-customize" type="text" required name="firstName" id="firstName">
+                                </div>
+                                <div class="form-group">
+                                    <label>@SharedResources["Last name"]</label>
+                                    <input class="form-control input-customize" type="text" required name="lastName" id="lastName">
+                                </div>
+                                <div class="form-group">
+                                    <label>@SharedResources["Email"]</label>
+                                    <input class="form-control input-customize" type="email" placeholder="your-email@example.com" required name="email" id="email">
+                                </div>
+                                <div class="form-group">
+                                    <label>@SharedResources["Password"]</label>
+                                    <input class="form-control input-customize" type="password" placeholder="@SharedResources["Password"]" required name="password" id="password">
+
+                                </div>
+                                @{
+                                    if (@ViewBag.Error != null)
+                                    {
+                                        <p style="font-size: 12px; color: #c21b17;">@SharedResources[@ViewBag.Error]</p>
+                                    }
+                                }
+                                <div class="form-group d-flex align-items-center justify-content-between">
+                                    <button type="submit" class="axil-btn btn-bg-primary submit-btn" style="max-width: 160px;">@SharedResources["Sign up"]</button>
+                                    <a href="/account/login" class="primary-tex-btn">@SharedResources["Sign in"]</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

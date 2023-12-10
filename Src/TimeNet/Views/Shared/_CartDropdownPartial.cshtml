@@ -1,0 +1,25 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<SharedResources> SharedResources
+
+<div class="cart-dropdown" id="cart-dropdown">
+    <div class="cart-content-wrap">
+        <div class="cart-header">
+            <h2 class="header-title">@SharedResources["Your cart"]</h2>
+            <button class="cart-close sidebar-close" aria-label="Search sidebar button"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-body">
+            <ul class="cart-item-list" id="cart-item-list">
+            </ul>
+        </div>
+        <div class="cart-footer" id="cart-footer">
+            <h3 class="cart-subtotal">
+                <span class="subtotal-title">@SharedResources["Subtotal"]:</span>
+                <span class="subtotal-amount" id="cart-subtotal-amount"></span>
+            </h3>
+            <div class="group-btn">
+                <a href="/cart" class="axil-btn btn-bg-primary viewcart-btn">@SharedResources["View cart"]</a>
+                <a href="/checkout" class="axil-btn btn-bg-secondary checkout-btn">@SharedResources["Checkout"]</a>
+            </div>
+        </div>
+    </div>
+</div>

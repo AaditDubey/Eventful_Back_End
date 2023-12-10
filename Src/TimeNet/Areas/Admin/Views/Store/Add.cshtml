@@ -1,0 +1,174 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var version = Guid.NewGuid;
+}
+<title>@SharedResources["Stores"] / @SharedResources["Add new"]</title>
+<style>
+    .flag-currency {
+        height: 20px;
+        width: 20px;
+        margin-right: 10px;
+        margin-bottom: 3px;
+    }
+</style>
+<div ng-controller="AddStoreController" ng-init="init()">
+    <form id="addStoreform" name="addStoreform" ng-submit="addStore(false)">
+        <div class="page-header">
+            <div>
+                <h2 class="main-content-title tx-24 mg-b-5">@SharedResources["Manage stores"]</h2>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">@SharedResources["Stores"]</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@SharedResources["Add new"]</li>
+                </ol>
+            </div>
+            <div class="d-flex">
+                <div class="justify-content-center">
+                    <a href="/admin/store" class="btn btn-danger">@SharedResources["Cancel"]</a>
+                    <button type="submit" class="btn btn-primary my-2 btn-icon-text">
+                        <i class="fe fe-save me-2"></i> @SharedResources["Save"]
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row row-sm">
+            <div class="col-lg-7 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h4 class="mb-4">@SharedResources["Basic information"]</h4>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Store name"]</label>
+                            <input type="text" class="form-control" id="name" name="store.name" required ng-model="store.name">
+                            <span class="form-valid-msg">@SharedResources["Store name"] @SharedResources["is required"]</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Store url"]</label>
+                            <input type="text" class="form-control" ng-model="store.url">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Primary currency"]</label>
+                            <select class="form-control" id="currencies-select" ng-model="store.defaultCurrency" required>
+                                <option ng-repeat="option in currencies" value="{{option.code}}" ng-bind="option.name"></option> 
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="custom-switch mt-3 mb-2">
+                                <input type="checkbox"
+                                       name="custom-switch-checkbox" class="custom-switch-input" ng-model="store.defaultStore">
+                                <span class="custom-switch-indicator"></span> <span class="custom-switch-description">
+                                    @SharedResources["Default store"]
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Company name"]</label>
+                            <input type="text" class="form-control" ng-model="store.companyName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Company address"]</label>
+                            <input type="text" class="form-control" ng-model="store.companyAddress">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="name">
+                                @SharedResources["Company phone number"]</label>
+                            <input type="text" class="form-control" ng-model="store.companyPhoneNumber">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Company VAT"]</label>
+                            <input type="text" class="form-control" ng-model="store.companyVat">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Description"]</label>
+                            <summernote ng-model="store.description"></summernote>
+                        </div>
+
+                        @* DefaultCurrency *@
+                    </div>
+                </div>
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h4 class="mb-4">@SharedResources["Logo"]</h4>
+                        <div class="">
+                            <label for="file-upload" class="btn btn-primary btn-icon-text" style="margin: 0px;">
+                                <i class="icon-cloud-upload btn-icon-prepend"></i> @SharedResources["Upload image"]
+                            </label>
+                            <input id="file-upload" type="file" name="files" onchange="angular.element(this).scope().addImage(this)" style="display:none;" />
+                        </div>
+                        <div class="row">
+                            <div class="panel panel-primary">
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <div id="image_preview" style="width:100%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h4 class="mb-4">@SharedResources["Search engine optimization"]</h4>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Home page meta title"]</label>
+                            <input type="text" class="form-control" id="name" name="store.metaTitle" ng-model="store.metaTitle">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Home page meta keywords"]</label>
+                            <input type="text" class="form-control" id="metaKeywords" name="store.metaKeywords" ng-model="store.metaKeywords">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Home page meta description"]</label>
+                            <div class="form-group">
+                                <textarea class="form-control" rows="6" id="metaDescription" name="store.metaDescription" ng-model="store.metaDescription"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h4 class="mb-4">@SharedResources["Bank account info"]</h4>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Bank name"]</label>
+                            <input type="text" class="form-control" ng-model="store.bankAccount.bankName">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Bank code"]</label>
+                            <input type="text" class="form-control" ng-model="store.bankAccount.bankCode">
+                        </div>
+                          <div class="form-group">
+                            <label for="name">@SharedResources["Swift code"]</label>
+                            <input type="text" class="form-control" ng-model="store.bankAccount.swiftCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">@SharedResources["Bank account number"]</label>
+                            <input type="text" class="form-control" ng-model="store.bankAccount.bankAccountNumber">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts
+{
+    <script src="~/plugins/summernote-editor/summernote1.js"></script>
+    <script src="~/admin/assets/js/services/CommonService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/LocaleService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/StoreService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/StorageService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/controllers/store/AddStoreController.js?v=@version"></script>
+}

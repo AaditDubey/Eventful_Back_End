@@ -1,0 +1,20 @@
+﻿[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+.qty-input {
+    margin: 0 5px;
+    min-width: 45px;
+    width: 28px;
+    float: left;
+    border: none;
+    height: 32px;
+    line-height: 30px;
+    padding: 0;
+    text-align: center;
+    background-color: rgba(0,0,0,0);
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 12px;
+    color: #27272e;
+}

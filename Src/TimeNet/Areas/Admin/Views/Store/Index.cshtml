@@ -1,0 +1,112 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var version = Guid.NewGuid;
+}
+<title>@SharedResources["Stores"] / @SharedResources["List"]</title>
+<div id="StoreController" ng-controller="StoreController" ng-init="init()">
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">@SharedResources["Manage stores"]</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">@SharedResources["Stores"]</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@SharedResources["List"]</li>
+            </ol>
+        </div>
+        <div class="d-flex">
+            <div class="justify-content-center">
+                <a href="/admin/store/add"
+                   class="btn btn-primary my-2 btn-icon-text">
+                    <i class="fe fe-plus-circle me-2"></i> @SharedResources["Add new"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row row-sm">
+        <div class="col-md-12 col-lg-12">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <div class="row table-filter">
+                        <div class="col-lg-5">
+                            <button data-bs-target="#modal-comfirm-delete" data-bs-toggle="modal" id="delete-selected-button" class="btn bg-danger" style="display: none; float: left; border-radius: 4px;">
+                                @SharedResources["Delete selected items"]
+                            </button>
+                        </div>
+                        <div class="col-lg-7 d-lg-flex justify-content-end">
+                            <div class="d-flex mt-4 mt-lg-0">
+                                <div class="filter-group">
+                                    <input type="text"
+                                           class="form-control rounded-end-0" placeholder="@SharedResources["Search"]" ng-model="FilterModel.SearchText">
+                                </div>
+                                <button ng-click="getStores()" type="button" class="btn btn-primary">
+                                    <i class="fe fe-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="store_table" class="table table-bordered border-bottom dataTable no-footer">
+                            <thead>
+                                <tr>
+                                    <th width="10">
+                                        <label class="custom-control custom-checkbox m-0 ms-2">
+                                            <input type="checkbox" class="custom-control-input" ng-model="isSelectedAll" ng-change="selectedAll()">
+                                            <span class="custom-control-label">&nbsp;</span>
+                                        </label>
+                                    </th>
+                                    <th>@SharedResources["Logo"]</th>
+                                    <th>@SharedResources["Store name"]</th>
+                                    <th>@SharedResources["Store url"]</th>
+                                    <th>@SharedResources["Primary currency"]</th>
+                                    <th>@SharedResources["Default store"]</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-comfirm-delete">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">@SharedResources["Messages"]</h6>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        @SharedResources["Are you sure delete all items selected?"]
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button ng-click="deleteSelected()" class="btn ripple btn-success" type="button">
+                        @SharedResources["Accept"]
+                    </button>
+                    <button class="btn ripple btn-danger" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Cancel"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var searchText = '@ViewBag.SearchText';
+</script>
+
+@section Scripts
+    {
+    <script src="~/plugins/datatables.net/js/jquery.dataTables.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-bs4/js/dataTables.bootstrap4.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-responsive/js/dataTables.responsive.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/CommonService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/StoreService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/ReportService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/controllers/store/StoreController.js?v=@version"></script>
+}

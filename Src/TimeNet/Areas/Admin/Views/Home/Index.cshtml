@@ -1,0 +1,138 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var version = Guid.NewGuid;
+}
+<title>@SharedResources["Dashboard"]</title>
+
+<div id="DashboardController" ng-controller="DashboardController" ng-init="init()">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Welcome To Dashboard</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Project Dashboard</li>
+            </ol>
+        </div>
+        <div class="d-flex">
+            <div class="justify-content-center">
+                <a href="https://event-frontend.bisfu.com/" class="btn btn-primary my-2 btn-icon-text">
+                    <i class="fe fe-plus-circle me-2"></i> Go to your website
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- End Page Header -->
+    <!--Row-->
+    <div class="row row-sm">
+        <div class="col-sm-12 col-lg-12 col-xl-8">
+            <div class="row row-sm">
+                <div class="col-lg-12">
+                    <div class="card custom-card mg-b-20">
+                        <div class="card-body">
+                            <div class="card-header border-bottom-0 pt-0 ps-0 pe-0 d-flex mb-3">
+                                <div>
+                                    <label class="main-content-label mb-2">
+                                        @SharedResources["Latest orders"]
+                                    </label>
+                                </div>
+                                <div class="ms-auto">
+                                    <a href="/admin/order"
+                                       class="">
+                                        @SharedResources["View more"]
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="table-responsive tasks">
+                                <table class="table card-table table-vcenter text-nowrap mb-0  border">
+                                    <thead>
+                                        <tr>
+                                            <th class="wd-lg-10p">@SharedResources["Order number"]</th>
+                                            <th class="wd-lg-20p">@SharedResources["Total"]</th>
+                                            <th class="wd-lg-20p">@SharedResources["Customer"]</th>
+                                            <th class="wd-lg-20p">@SharedResources["Order status"]</th>
+                                            <th class="wd-lg-20p">@SharedResources["Created on"]</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="order in orders">
+                                            <td class="font-weight-semibold d-flex">
+                                                <a class="mt-1" href="{{'/admin/order/update/' + order.id }}">#{{order.orderNumber}}</a>
+                                            </td>
+                                            <td class="text-center">{{order.orderTotal}}</td>
+                                            <td class="text-primary">{{order.customerEmail}}</td>
+                                            <td>
+                                                <span class="{{order.class}}">
+                                                    {{order.orderStatus}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>
+                                                    {{convertDate(order.createdOn)}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              
+            </div>
+            <!-- Row end -->
+        </div>
+        <!-- col end -->
+        <div class="col-sm-12 col-lg-12 col-xl-4">
+            <div class="card custom-card card-dashboard-calendar pb-0">
+                <label class="main-content-label mb-2 pt-1">@SharedResources["New events"]</label>
+                <table class="table table-hover m-b-0 transcations mt-2">
+                    <tbody>
+                        <tr ng-repeat="product in products" class="cursor-pointer" ng-click="goToDetailPage('product', product.id)">
+                            <td class="wd-10p">
+                                <img alt="avatar" class="me-3" src="{{convertUrlImage(product.images[0])}}" style="height: 40px;">
+                            </td>
+                            <td>
+                                <div class="d-flex align-middle ms-3">
+                                    <div class="d-inline-block">
+                                        <h6 class="mb-1">{{product.name}}</h6>
+                                        <p class="mb-0 tx-13 text-muted">{{product.price}}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-block">
+                                    <h2 class="mb-2 tx-15 font-weight-semibold">
+                                        <i class="fe fe-chevron-right ms-2 text-muted m-l-10"></i>
+                                    </h2>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">
+                                <a href="/admin/event" class="tx-15 font-weight-semibold">
+                                    @SharedResources["View more"]
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- col end -->
+    </div>
+    <!-- Row end -->
+
+</div>
+
+@section Scripts
+{
+    <script src="~/admin/assets/js/services/CommonService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/OrderService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/UserService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/ProductService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/controllers/dashboard/DashboardController.js?v=@version"></script>
+}

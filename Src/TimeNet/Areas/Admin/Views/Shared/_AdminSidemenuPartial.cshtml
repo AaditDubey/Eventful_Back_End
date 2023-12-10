@@ -1,0 +1,125 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Time.Commerce.Application.Helpers
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@inject IWorkContext WorkContext
+@{
+    var role = WorkContext.GetCurrentRole();
+}
+<div class="sticky" style="margin-bottom: -64px;">
+    <div class="main-menu main-sidebar main-sidebar-sticky side-menu is-expanded ps">
+        <div class="main-sidebar-header main-container-1 active">
+            <div class="sidemenu-logo">
+                <a class="main-logo" href="/">
+                    <img src="~/admin/assets/img/brand/logo.png" class="header-brand-img desktop-logo"
+                         alt="logo" style="height: 50px;"> <img src="~/admin/assets/img/brand/icon.png"
+                                          class="header-brand-img icon-logo" alt="logo" style="height: 50px;"> <img src="~/admin/assets/img/brand/logo.png" class="header-brand-img desktop-logo theme-logo"
+                                                                                              alt="logo"> <img src="~/admin/assets/img/brand/icon.png"
+                                                                                                               class="header-brand-img icon-logo theme-logo" alt="logo">
+                </a>
+            </div>
+            <div class="main-sidebar-body main-body-1">
+                <div class="slide-left disabled active d-none" id="slide-left">
+                    <i class="fe fe-chevron-left"></i>
+                </div>
+                <ul class="menu-nav nav" style="margin-left: 0px; margin-right: 0px;">
+                    @if (role == "Admin" || role == "SystemAdmin" || role == "Event Host")
+                    {
+                        <li class="nav-header"><span class="nav-label">@SharedResources["Dashboard"]</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-home sidemenu-icon menu-icon "></i> <span class="sidemenu-label">@SharedResources["Dashboard"]</span>
+                            </a>
+                        </li>
+                    }
+                    @if (role == "Admin" || role == "SystemAdmin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link with-sub" href="javascript:void(0)">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-shopping-cart-full sidemenu-icon menu-icon "></i> <span class="sidemenu-label">
+                                    <span class="sidemenu-label2">@SharedResources["Manage users"]</span>
+                                </span> <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            <ul class="nav-sub">
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/user">@SharedResources["Customer"]</a>
+                                </li>
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/speaker">@SharedResources["Speaker"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link with-sub" href="javascript:void(0)">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-shopping-cart-full sidemenu-icon menu-icon "></i> <span class="sidemenu-label">
+                                    <span class="sidemenu-label2">@SharedResources["Sales"]</span>
+                                </span> <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            <ul class="nav-sub">
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/order">@SharedResources["Orders"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link with-sub" href="javascript:void(0)">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-wallet sidemenu-icon menu-icon "></i> <span class="sidemenu-label">
+                                    <span class="sidemenu-label2">@SharedResources["Messages"]</span>
+                                </span> <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            <ul class="nav-sub">
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/contactMessage">@SharedResources["Message"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link with-sub" href="javascript:void(0)">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-shopping-cart-full sidemenu-icon menu-icon "></i> <span class="sidemenu-label">
+                                    <span class="sidemenu-label2">@SharedResources["Content"]</span>
+                                </span> <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            <ul class="nav-sub">
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/blogpost">@SharedResources["Blog post"]</a>
+                                </li>
+                                @*   <li class="nav-sub-item">
+                            <a class="nav-sub-link sub-with-sub"
+                            href="/admin/content">@SharedResources["Page"]</a>
+                            </li> *@
+                            </ul>
+                        </li>
+                    }
+                    @if (role == "Admin" || role == "SystemAdmin" || role == "Event Host")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link with-sub" href="javascript:void(0)">
+                                <span class="shape1"></span> <span class="shape2"></span> <i class="ti-package sidemenu-icon menu-icon "></i> <span class="sidemenu-label">
+                                    <span class="sidemenu-label2">@SharedResources["Manage events"]</span>
+                                </span> <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            <ul class="nav-sub">
+                                <li class="nav-sub-item">
+                                    <a class="nav-sub-link sub-with-sub"
+                                       href="/admin/event">@SharedResources["Events"]</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+                <div class="slide-right" id="slide-right"><i class="fe fe-chevron-right"></i></div>
+            </div>
+        </div>
+        <div class="ps__rail-x" style="left: 0px; top: 0px;">
+            <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+        </div>
+        <div class="ps__rail-y" style="top: 0px; right: 0px;">
+            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+        </div>
+    </div>
+</div>

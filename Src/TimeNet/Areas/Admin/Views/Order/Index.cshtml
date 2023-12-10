@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var version = Guid.NewGuid;
+}
+<title>@SharedResources["Orders"] / @SharedResources["List"]</title>
+<div id="OrderController" ng-controller="OrderController" ng-init="init()">
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">@SharedResources["Manage orders"]</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">@SharedResources["Orders"]</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@SharedResources["List"]</li>
+            </ol>
+        </div>
+        <div class="d-flex">
+            <div class="justify-content-center">
+                <a href="/admin/order/add"
+                   class="btn btn-primary my-2 btn-icon-text">
+                    <i class="fe fe-plus-circle me-2"></i> @SharedResources["Add new"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row row-sm">
+        <div class="col-md-12 col-lg-12">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <div class="row table-filter">
+                        <div class="col-lg-5">
+                            <button data-bs-target="#modal-comfirm-delete" data-bs-toggle="modal" id="delete-selected-button" class="btn bg-danger" style="display: none; float: left; border-radius: 4px;">
+                                @SharedResources["Delete selected items"]
+                            </button>
+                            <div class="show-entries" id="table-tab">
+                                <label class="tab-customize my-auto pt-2 me-3"
+                                       ng-class="{'tab-customize-active': option.value === FilterModel.OrderStatus, 'tab-customize-inactive': option.value !== FilterModel.OrderStatus}"
+                                       ng-repeat="option in listOrderStatuses" 
+                                    ng-click="setActive(option.value)">
+                                    {{option.name}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 d-lg-flex justify-content-end">
+                            <div class="d-flex mt-4 mt-lg-0">
+                                <div class="filter-group">
+                                    <input type="text"
+                                           class="form-control rounded-end-0" placeholder="@SharedResources["Search"]" ng-model="FilterModel.SearchText">
+                                </div>
+                                <button ng-click="getOrders()" type="button" class="btn btn-primary" style="height: 38px;">
+                                    <i class="fe fe-search"></i>
+                                </button>
+                               
+                                <a aria-controls="collapseExample" aria-expanded="false"
+                                   class="btn ripple btn-primary collapsed ms-2" style="border-radius: 4px; height: 38px;" data-bs-toggle="collapse"
+                                   href="#collapseExample" role="button"><i class="fe fe-filter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="collapse" id="collapseExample">
+                        <div class="row">
+                            <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-12">
+                                <label for="name">
+                                    @SharedResources["Shipping status"]
+                                </label>
+                                <select class="form-control select2" ng-model="FilterModel.ShippingStatus">
+                                    <option ng-repeat="option in shippingStatuses" value="{{option.value}}" ng-bind="option.name"></option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-12">
+                                <label for="name">
+                                    @SharedResources["Payment status"]
+                                </label>
+                                <select class="form-control select2" ng-model="FilterModel.PaymentStatus">
+                                    <option ng-repeat="option in paymentStatuses" value="{{option.value}}" ng-bind="option.name"></option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-12">
+                                <label for="name">
+                                    @SharedResources["From date"]
+                                </label>
+                                <input type="date" class="form-control" id="startDateUtc" ng-model="FilterModel.FromDate">
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-12">
+                                <label for="name">
+                                    @SharedResources["To date"]
+                                </label>
+                                <input type="date" class="form-control" id="toDateUtc" ng-model="FilterModel.ToDate">
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-3 col-md-4 col-sm-12">
+                                <button type="button" class="btn btn-primary" ng-click="getOrders()" style="margin-top: 28px;">@SharedResources["Apply filter"]</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="order_table" class="table table-bordered border-bottom dataTable no-footer">
+                            <thead>
+                                <tr>
+                                    <th width="10">
+                                        <label class="custom-control custom-checkbox m-0 ms-2">
+                                            <input type="checkbox" class="custom-control-input" ng-model="isSelectedAll" ng-change="selectedAll()">
+                                            <span class="custom-control-label">&nbsp;</span>
+                                        </label>
+                                    </th>
+                                    <th>@SharedResources["Order number"]</th>
+                                    <th>@SharedResources["Order status"]</th>
+                                    <th>@SharedResources["Total"]</th>
+                                    <th>@SharedResources["Customer"]</th>
+                                    <th>@SharedResources["Shipping status"]</th>
+                                    <th>@SharedResources["Payment status"]</th>
+                                    <th>@SharedResources["Created on"]</th>
+                                    <th>@SharedResources["Updated on"]</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-comfirm-delete">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">@SharedResources["Messages"]</h6>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        @SharedResources["Are you sure delete all items selected?"]
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button ng-click="deleteSelected()" class="btn ripple btn-success" type="button">
+                        @SharedResources["Accept"]
+                    </button>
+                    <button class="btn ripple btn-danger" data-bs-dismiss="modal" type="button">
+                        @SharedResources["Cancel"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var searchText = '@ViewBag.SearchText';
+</script>
+
+@section Scripts
+    {
+    <script src="~/plugins/datatables.net/js/jquery.dataTables.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-bs4/js/dataTables.bootstrap4.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-responsive/js/dataTables.responsive.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/plugins/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/CommonService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/OrderService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/services/ReportService.js?v=@version" asp-append-version="true"></script>
+    <script src="~/admin/assets/js/controllers/order/OrderController.js?v=@version"></script>
+}

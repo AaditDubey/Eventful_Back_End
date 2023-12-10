@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@model Time.Commerce.Contracts.Models.Identity.LoginCookiesModel
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@{
+    var returnUrl = @Context.Request.Query["returnurl"];
+}
+<style>
+    .input-customize{
+        height: 60px !important;
+        padding: 0 30px !important;
+        color: var(--color-body) !important;
+    }
+
+    .sign-in-form{
+        min-height: 600px;
+        align-items: center;
+    }
+
+    .primary-tex-btn {
+        font-size: 14px;
+        color: var(--color-primary);
+        transition: var(--transition);
+    }
+</style>
+<div class="wrapper vcenter-item">
+    <div class="box">
+        <div class="container">
+            <div class="row justify-content-center sign-in-form">
+                <div class="col-md-7 col-lg-5">
+                    <div class="wrap">
+                        <div class="justify-content-center">
+                            <h3 class="title">@SharedResources["Sign in"]</h3>
+                            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@returnUrl" method="post">
+                                <div class="form-group">
+                                    <label>@SharedResources["Email"]</label>
+                                    <input class="form-control input-customize" type="email" placeholder="your-email@example.com" required name="username" id="username">
+                                </div>
+                                <div class="form-group">
+                                    <label>@SharedResources["Password"]</label>
+                                    <input class="form-control input-customize" type="password" placeholder="@SharedResources["Password"]" required name="password" id="password">
+
+                                </div>
+                                @{
+                                    if (@ViewBag.Error != null)
+                                    {
+                                        <p style="font-size: 12px; color: #c21b17;">@SharedResources["Email or password in correct"]</p>
+                                    }
+                                }
+                                <div class="form-group d-flex align-items-center justify-content-between">
+                                    <button type="submit" class="axil-btn btn-bg-primary submit-btn" style="max-width: 160px;">@SharedResources["Sign in"]</button>
+                                    <a href="#" class="primary-tex-btn">@SharedResources["Forget password"]?</a>
+                                </div>
+                                <div class="col text-left">
+                                    <div class="border-checkbox-section">
+                                        <p class="text-color-customize">@SharedResources["No account yet"]? <a href="/account/Signup" style="font-weight: bold;">@SharedResources["Sign up"]</a></p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

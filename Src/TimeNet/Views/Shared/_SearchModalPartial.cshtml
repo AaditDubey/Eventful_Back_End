@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<SharedResources> SharedResources
+
+<div class="header-search-modal" id="header-search-modal">
+    <button class="card-close sidebar-close" aria-label="Search sidebar button"><i class="fas fa-times"></i></button>
+    <div class="header-search-wrap">
+        <div class="card-header">
+            <form action="#">
+                <div class="input-group">
+                    <input type="search" ng-model="searchText" ng-change="onSearchTextChange()" class="form-control" name="prod-search" id="prod-search" placeholder="@SharedResources["What are you looking for"]...">
+                    <button type="submit" class="axil-btn btn-bg-primary" aria-label="Search button"><i class="far fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="card-body">
+            <div class="search-result-header" ng-if="searchResults.totalItems > 0">
+                <h6 class="title">{{searchResults.totalItems}} Result Found</h6>
+                <a href="{{'/search?searchText=' + searchText}}" class="view-all">View All</a>
+            </div>
+            <div class="psearch-results">
+                <div class="axil-product-list" ng-repeat="product in searchResults.items" style="cursor: pointer;" ng-click="goto('/' + product.seName + '.html')">
+                    <div class="thumbnail">
+                        <a href="/{{product.seName}}.html">
+                            <img src="{{convertUrlImage(product.images[0])}}" alt="{{product.name}}" style="height: 100px;">
+                        </a>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-rating">
+                            <span class="rating-icon">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fal fa-star"></i>
+                            </span>
+                            <span class="rating-number"><span>100+</span> Reviews</span>
+                        </div>
+                        <h6 class="product-title"><a href="single-product.html">{{product.name}}</a></h6>
+                        <div class="product-price-variant">
+                            <span class="price current-price">{{convertCurrency(product.price)}}</span>
+                            <span class="price old-price" ng-if="product.oldPrice > product.price">{{convertCurrency(product.oldPrice)}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

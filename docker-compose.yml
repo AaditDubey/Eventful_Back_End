@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+   eventaspnetcoreapi:
+    image: eventaspnetcoreapi:${TAG:-latest}
+    container_name: eventaspnetcoreapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      #- "6001:443"
+      - "6003:80"
+    #map store file to system directory
+    volumes:
+      - '/eventaspnetcoreapi:/app/wwwroot/s3'

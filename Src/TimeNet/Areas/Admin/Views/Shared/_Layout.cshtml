@@ -1,0 +1,287 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Time.Commerce.Application.Services.Catalog;
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@* @inject IStoreSettingService SettingService *@
+
+@{
+    var version = Guid.NewGuid;
+    var path = Context.Request.Path.ToString().ToLower();
+    var isTablePage = !path.Contains("/add") && !path.Contains("/update");
+    // var stores = await SettingService.FindAsync(new Time.Commerce.Contracts.Models.Catalog.StoreSettingQueryModel{ PageSize = 2 });
+    // var store = stores.Items.FirstOrDefault();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="~/admin/assets/img/brand/favicon.ico" type="image/x-icon">
+    <!-- Bootstrap css-->
+    <link id="style" href="~/admin/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons css-->
+    <link href="~/admin/assets/plugins/web-fonts/icons.css" rel="stylesheet">
+    <link href="~/admin/assets/plugins/web-fonts/font-awesome/font-awesome.min.css" rel="stylesheet">
+    <link href="~/admin/assets/plugins/web-fonts/plugin.css" rel="stylesheet">
+    <!-- Style css-->
+    <link href="~/admin/assets/css/style.css" rel="stylesheet">
+    <!-- Select2 css-->
+    <link href="~/admin/assets/plugins/select2/css/select2.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/plugins/jquery-toast-plugin/dist/jquery.toast.min.css">
+    @{
+        if (isTablePage)
+        {
+            <link rel="stylesheet" href="~/plugins/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+        }
+        else
+        {
+            <!-- Mutipleselect css-->
+            <link rel="stylesheet" href="~/admin/assets/plugins/multipleselect/multiple-select.css">
+            <!-- Internal Quill css-->
+            <link href="~/admin/assets/plugins/quill/quill.snow.css" rel="stylesheet">
+            <link href="~/admin/assets/plugins/quill/quill.bubble.css" rel="stylesheet">
+            <!-- InternalFancy uploader css-->
+            // <link href="~/admin/assets/plugins/fancyuploder/fancy_fileupload.css" rel="stylesheet">
+
+            // <link rel="stylesheet" href="~/plugins/summernote/dist/summernote-bs4.css">
+            <!-- Internal Summernote css-->
+            <link rel="stylesheet" href="~/plugins/summernote-editor/summernote.css">
+            <link rel="stylesheet" href="~/plugins/summernote-editor/summernote1.css">
+
+            <link rel="stylesheet" href="~/plugins/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
+
+            <!-- Internal Specturm-color picker css-->
+            <link href="~/admin/assets/plugins/spectrum-colorpicker/spectrum.css" rel="stylesheet">
+        }
+    }
+
+    <!-- Switcher css-->
+    <link href="~/admin/assets/switcher/css/switcher.css" rel="stylesheet">
+    <link href="~/admin/assets/switcher/demo.css" rel="stylesheet">
+
+    <!-- Jquery js-->
+    <script src="~/admin/assets/plugins/jquery/jquery.min.js"></script>
+    <script src="~/lib/angular/angular.min.js"></script>
+
+    @* <script src="~/lib/angular/angularDatatable.js"></script> *@
+
+    <meta http-equiv="imagetoolbar" content="no">
+    <link href="~/admin/assets/css/customize.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg-color: #6259ca;
+            --primary-bg-hover: #403fad;
+            --primary-transparentcolor: rgba(98, 89, 202, 0.16);
+            --primary-bg-border: #6259ca;
+            --dark-theme: #0e0e23;
+            --dark-body: #24243e;
+            --dark-border: rgba(255, 255, 255, 0.15);
+            --dark-color: #d0d0e2;
+            --dark-primary: #6259ca;
+            --indigo: $indigo;
+            --purple: $purple;
+            --pink: #f1388b;
+            --orange: $orange;
+            --yellow: #ffc107;
+            --green: #28a745;
+            --teal: #20c997;
+            --cyan: #17a2b8;
+            --white: $white;
+            --gray: #6c757d;
+            --gray-dark: #343a40;
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --breakpoint-xs: 0;
+            --breakpoint-sm: 576px;
+            --breakpoint-md: 768px;
+            --breakpoint-lg: 992px;
+            --breakpoint-xl: 1200px;
+            --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+    </style>
+</head>
+
+<body class="ltr main-body leftmenu light-theme" ng-app="TimeSolution" id="SiteController" ng-controller="SiteController">
+    <div id="progress-bar">
+        <div class="progress-bar-value"></div>
+    </div>
+    <div class="horizontalMenucontainer">
+        @await Html.PartialAsync("_AdminSettingsPartial")
+
+        <!-- Loader -->
+        <div id="global-loader">
+            <img src="~/admin/assets/img/loader.svg" class="loader-img"
+                 alt="Loader">
+        </div>
+        <!-- End Loader -->
+        <!-- Page -->
+        <div class="page">
+            @await Html.PartialAsync("_AdminHeaderPartial")
+
+            @await Html.PartialAsync("_AdminSidemenuPartial")
+
+            <div class="main-content side-content pt-0">
+                <div class="main-container container-fluid">
+                    <div class="inner-body">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+
+            @await Html.PartialAsync("_AdminFooterPartial")
+
+            @await Html.PartialAsync("_AdminSidebarPartial")
+
+        </div>
+        <!-- End Page -->
+        <!-- Back-to-top -->
+        <a href="#top" id="back-to-top" style="display: none;"><i class="fe fe-arrow-up"></i></a>
+
+        <!-- Bootstrap js-->
+        <script src="~/admin/assets/plugins/bootstrap/js/popper.min.js"></script>
+
+        <script src="~/admin/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+        <script src="~/admin/assets/plugins/select2/js/select2.min.js"></script>
+
+        <script src="~/admin/assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+
+        <script src="~/admin/assets/plugins/sidemenu/sidemenu.js?v=@version"></script>
+
+        <script src="~/admin/assets/plugins/sidebar/sidebar.js"></script>
+        @*
+        <script src="~/admin/assets/plugins/chart.js/Chart.bundle.min.js"></script>
+
+        <script src="~/admin/assets/plugins/peity/jquery.peity.min.js"></script>
+        <script src="~/admin/assets/plugins/raphael/raphael.min.js"></script>
+        <script src="~/admin/assets/plugins/morris.js/morris.min.js"></script>
+        *@
+
+
+        <script src="~/admin/assets/js/select2.js"></script>
+
+        <script src="~/admin/assets/js/sticky.js"></script>
+
+        <script src="~/admin/assets/js/custom.js?v=@version"></script>
+
+        <script src="~/admin/assets/switcher/js/switcher.js"></script>
+        <script src="~/plugins/jquery-toast-plugin/dist/jquery.toast.min.js"></script>
+
+        <!--Modules-->
+        <script src="~/lib/angular-summernote/angular-summernote.js" asp-append-version="true"></script>
+        <script src="~/admin/assets/js/module/module.js?v=@version"></script>
+
+        <!--Controllers-->
+        <script src="~/admin/assets/js/controllers/SiteController.js?v=@version"></script>
+        
+        @RenderSection("Scripts",false)
+        
+        <script>
+            var globalLocalizer = {
+                common: {
+                    all: "@SharedResources["All"]",
+                    select: "@SharedResources["Select"]",
+                    active: "@SharedResources["Active only"]",
+                    inactive: "@SharedResources["Inactive only"]",
+                    success: "@SharedResources["Success"]",
+                    error: "@SharedResources["Error"]"
+                },
+                messages: {
+                    someThingWentWrong: "@SharedResources["Some thing went wrong"]",
+                    savedDataSuccess: "@SharedResources["Saved data successfully!"]",
+                    deleteDataSuccess: "@SharedResources["Delete data successfully!"]",
+                    ACCOUNT_EXISTED: "@SharedResources["Account already exists"]",
+                },
+                datatableLanguageConfig: {
+                    "search": "@SharedResources["Search"]:",
+                    "paginate": {
+                        "previous": "@SharedResources["Previous page"]",
+                        "next": "@SharedResources["Next page"]"
+                    },
+                    "lengthMenu": "@SharedResources["Display _MENU_ record per page"]",
+                    "zeroRecords": `<div class="justify-content-center"><img class="my-4" height="200" src="/admin/assets/img/no_data.svg"><p>@SharedResources["Not found value"]</p></div>`,
+                    "info": "@SharedResources["Display _START_ to _END_ of _TOTAL_ record"]",
+                    "infoEmpty": "@SharedResources["Not found any record"]",
+                    "processing": `<div class="d-flex justify-content-center processing-card"><div class="spinner-border text-primary" role="status"></div><div class="justify-content-center text">@SharedResources["Processing"]...</div></div>`,//"@SharedResources["Processing"]",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                sales: {
+                    orderStatuses: [
+                        { id: "Pending", name: "@SharedResources["Pending"]" },
+                        { id: "Processing", name: "@SharedResources["Processing"]" },
+                        { id: "Complete", name: "@SharedResources["Complete"]" },
+                        { id: "Cancelled", name: "@SharedResources["Cancelled"]" },
+                    ],
+                    paymentStatuses: [
+                        { id: "Pending", name: "@SharedResources["Not yet paid"]" },
+                        { id: "Paid", name: "@SharedResources["Paid"]" },
+                    ],
+                    shippingStatuses: [
+                        { id: "WaitingForDeliver", name: "@SharedResources["Waiting for deliver"]" },
+                        { id: "Shipped", name: "@SharedResources["Shipped"]" },
+                    ]
+                },
+                activeTabValues: [
+                    {
+                        value: null,
+                        name: "@SharedResources["All"]"
+                    },
+                    {
+                        value: true,
+                        name: "@SharedResources["Active only"]"
+                    },
+                    {
+                        value: false,
+                        name: "@SharedResources["Inactive only"]"
+                    }
+                ],
+                discountTypeValues: [
+                    { id: "AssignedToOrderTotal", name: "@SharedResources["Assigned to order total"]" },
+                    { id: "AssignedToProducts", name: "@SharedResources["Assigned to order products "]" },
+                    { id: "AssignedToCategories", name: "@SharedResources["Assigned to categories "]" },
+                    { id: "AssignedToBrands", name: "@SharedResources["Assigned to brands"]" },
+                    { id: "AssignedToShipping", name: "@SharedResources["Assigned to shipping"]" },
+                    { id: "AssignedToAll", name: "@SharedResources["Assigned to all"]" }
+                ]
+            }
+
+            var message = {
+                saveSuccess: () => {
+                    showToast({ title: globalLocalizer.common.success, content: globalLocalizer.messages.savedDataSuccess, type: 'success' })
+                },
+                deleteSuccess: () => {
+                    showToast({ title: globalLocalizer.common.success, content: globalLocalizer.messages.deleteDataSuccess, type: 'success' })
+                },
+                error: () => {
+                    showToast({ title: globalLocalizer.common.error, content: globalLocalizer.messages.someThingWentWrong, type: 'error' })
+                },
+                successWithMessage: (msg) => {
+                    showToast({ title: globalLocalizer.common.success, content: msg, type: 'success' })
+                },
+                errorWithMessage: (msg) => {
+                    showToast({ title: globalLocalizer.common.error, content: msg, type: 'error' })
+                },
+                showErrorWithKey: (key) => {
+                    const msg = globalLocalizer.messages[key]
+                    if(msg)
+                        showToast({ title: globalLocalizer.common.error, content: msg, type: 'error' })
+                    else
+                        showToast({ title: globalLocalizer.common.error, content: globalLocalizer.messages.someThingWentWrong, type: 'error' })
+                }
+            }
+        </script>
+
+    </div>
+    <div class="main-navbar-backdrop"></div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+﻿@using Microsoft.AspNetCore.Localization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Time.Commerce.Application.Helpers;
+@using Time.Commerce.Application.Services.Catalog;
+@using Time.Commerce.Contracts.Views.Cms;
+@using TimeNet;
+@inject IHtmlLocalizer<SharedResources> SharedResources
+@model IList<MenuView>
+@inject ICategoryService CategoryService
+@inject IWorkContext WorkContext
+@{
+    var categories = await CategoryService.GetAllWithRecursive(
+        new Time.Commerce.Contracts.Models.Catalog.CategoryQueryModel { 
+            Published = true, ShowOnHomePage = true, PageSize = 200, OrderBy = "DisplayOrder", Ascending = true
+        });
+    var url = Context.Request.Path.ToString();
+    var isHomePage = url == "/" || string.IsNullOrEmpty(url);
+
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var currentLang = requestCulture?.RequestCulture.Culture.Name;
+
+    var userClaims = WorkContext.GetUserClaimsInfo();
+    var isAuthenticated = userClaims is not null;
+}
+<style>
+    .dropdown-content {
+        display: none;
+    }
+        .dropdown-content a {
+            display: block;
+        }
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
+<header class="header axil-header header-style-2">
+    <!-- Start Header Top Area  -->
+    <div class="axil-header-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-2 col-sm-3 col-5">
+                    <div class="header-brand">
+                        <a href="/" class="logo logo-dark">
+                            <img src="~/theme/assets/images/logo/logo.png" alt="Site Logo">
+                        </a>
+                        <a href="/" class="logo logo-light">
+                            <img src="~/theme/assets/images/logo/logo-light.png" alt="Site Logo">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-10 col-sm-9 col-7">
+                    <div class="header-top-dropdown dropdown-box-style">
+                        <div class="axil-search">
+                            <button type="button" class="icon wooc-btn-search" aria-label="Search button">
+                                <i class="far fa-search"></i>
+                            </button>
+                            <input type="search" class="placeholder product-search-input" name="search2" id="search2" value="" maxlength="128" placeholder="@SharedResources["What are you looking for"]...." autocomplete="off">
+                        </div>
+                      @*   <div class="dropdown">
+                            <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                USD
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">USD</a></li>
+                                <li><a class="dropdown-item" href="#">AUD</a></li>
+                                <li><a class="dropdown-item" href="#">EUR</a></li>
+                            </ul>
+                        </div> *@
+                        <div class="dropdown">
+                            <button class="dropdown-toggle" type="button" aria-label="@(currentLang == "vi" ? "Tiếng Việt" : "English")" data-bs-toggle="dropdown" aria-expanded="false">
+                                @(currentLang == "vi" ? "Tiếng Việt" : "English")
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/Culture/SetCulture?culture=vi&returnUrl=@Context.Request.Path">Tiếng Việt</a></li>
+                                <li><a class="dropdown-item" href="/Culture/SetCulture?culture=en-US&returnUrl=@Context.Request.Path">English</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Header Top Area  -->
+    <!-- Start Mainmenu Area  -->
+    <div class="axil-mainmenu aside-category-menu">
+        <div class="container">
+            <div class="header-navbar">
+                <div class="header-nav-department">
+                    <aside class="header-department @(isHomePage ? "" : "dropdown")">
+                        <button aria-label="Categories button" class="header-department-text department-title @(isHomePage ? "" : "dropbtn")">
+                            <span class="icon"><i class="fal fa-bars"></i></span>
+                            <span class="text">Categories</span>
+                        </button>
+                        <nav class="department-nav-menu @(isHomePage ? "" : "dropdown-content")">
+                            <button aria-label="Sidebar button" class="sidebar-close"><i class="fas fa-times"></i></button>
+                            <ul class="nav-menu-list">
+                                @if (categories is not null && categories.Any())
+                                {
+                                    foreach (var category in categories)
+                                    {
+                                        @if (category.Children.Any())
+                                        {
+                                            <li>
+                                                <a href="#" class="nav-link has-megamenu">
+                                                    <span class="menu-icon"><img src="/@category.ImageUrl" alt="@category.Name"></span>
+                                                    <span class="menu-text">@category.Name</span>
+                                                </a>
+                                                <div class="department-megamenu">
+                                                    <div class="department-megamenu-wrap">
+                                                        <div class="department-submenu-wrap">
+                                                            @{
+                                                                int pageSize = 3;
+                                                                int totalItems = category.Children.Count;
+                                                                var totalPage = (totalItems / pageSize);
+                                                                if (totalItems % pageSize > 0)
+                                                                    ++totalPage;
+                                                                for (int i = 0; i < pageSize; i++)
+                                                                {
+                                                                    <div class="department-submenu">
+                                                                        @for (int j = 0; j < totalPage; j++)
+                                                                        {
+                                                                            var index = totalPage * i + j;
+                                                                            if (index <= totalItems - 1)
+                                                                            {
+                                                                                var subCategory = category.Children[index];
+                                                                                @if (subCategory.Children.Any())
+                                                                                {
+                                                                                    <h3 class="submenu-heading">
+                                                                                        @subCategory.Name
+                                                                                    </h3>
+                                                                                    <ul>
+                                                                                        @foreach (var sub2 in subCategory.Children)
+                                                                                        {
+                                                                                            <li><a href="/search?category=@sub2.SeName">@sub2.Name</a></li>
+                                                                                        }
+                                                                                    </ul>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <a href="/search?category=@subCategory.SeName">
+                                                                                        @subCategory.Name
+                                                                                    </a>
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                }
+                                                            }
+                                                        </div>
+                                                        <div class="featured-product">
+                                                            <h3 class="featured-heading">Featured</h3>
+                                                            <div class="product-list">
+                                                              @*   <div class="item-product">
+                                                                    <a href="#"><img src="~/theme/assets/images/product/product-feature1.png" alt="Featured Product"></a>
+                                                                </div> *@
+                                                            </div>
+                                                            <a href="#" class="axil-btn btn-bg-primary">See All Offers</a>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a href="/search?category=@category.SeName" class="nav-link">
+                                                    <span class="menu-icon"><img src="/@category.ImageUrl" alt="@category.Name"></span>
+                                                    <span class="menu-text">@category.Name</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </nav>
+                    </aside>
+                </div>
+                <div class="header-main-nav">
+                    <!-- Start Mainmanu Nav -->
+                    <nav class="mainmenu-nav">
+                        <button class="mobile-close-btn mobile-nav-toggler" aria-label="Mobile navigation button"><i class="fas fa-times"></i></button>
+                        <div class="mobile-nav-brand">
+                            <a href="/" class="logo">
+                                <img src="~/theme/assets/images/logo/logo.png" alt="Site Logo">
+                            </a>
+                        </div>
+                        <ul class="mainmenu">
+                            @if (Model is not null)
+                            {
+                                foreach (var menu in Model)
+                                {
+                                    if (menu.Children.Any())
+                                    {
+                                        <li class="menu-item-has-children">
+                                            <a href="#">@menu.Title</a>
+                                            <ul class="axil-submenu">
+                                                @{
+                                                    foreach (var subMenu in menu.Children)
+                                                    {
+                                                        <li><a href="@subMenu.Link">@subMenu.Title</a></li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </li>
+
+                                    }
+                                    else
+                                    {
+                                        <li><a href="@menu.Link">@menu.Title</a></li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </nav>
+                    <!-- End Mainmanu Nav -->
+                </div>
+                <div class="header-action">
+                    <ul class="action-list">
+                        <li class="axil-search d-sm-none d-block">
+                            <a href="javascript:void(0)" class="header-search-icon" title="Search">
+                                @* <i class="flaticon-magnifying-glass"></i> *@
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17px" height="18px" viewBox="0 0 18.942 20" class="md:w-4 xl:w-5 md:h-4 xl:h-5"><path d="M381.768,385.4l3.583,3.576c.186.186.378.366.552.562a.993.993,0,1,1-1.429,1.375c-1.208-1.186-2.422-2.368-3.585-3.6a1.026,1.026,0,0,0-1.473-.246,8.343,8.343,0,1,1-3.671-15.785,8.369,8.369,0,0,1,6.663,13.262C382.229,384.815,382.025,385.063,381.768,385.4Zm-6.152.579a6.342,6.342,0,1,0-6.306-6.355A6.305,6.305,0,0,0,375.615,385.983Z" transform="translate(-367.297 -371.285)" fill="currentColor" fill-rule="evenodd"></path></svg>
+                            </a>
+                        </li>
+                      @*   <li class="wishlist">
+                            <a href="wishlist.html">
+                                <i class="flaticon-heart"></i>
+                            </a>
+                        </li> *@
+                        <li class="shopping-cart">
+                            <a href="javascript:void(0)" class="cart-dropdown-btn" aria-label="Cart dropdown">
+                                <span class="cart-count d-none" id="cart-count-badge"></span>
+                                @* <i class="flaticon-shopping-cart"></i> *@
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 20 20" class="md:w-4 xl:w-5 md:h-4 xl:h-5"><path d="M5,4H19a1,1,0,0,1,1,1V19a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V5A1,1,0,0,1,5,4ZM2,5A3,3,0,0,1,5,2H19a3,3,0,0,1,3,3V19a3,3,0,0,1-3,3H5a3,3,0,0,1-3-3Zm10,7C9.239,12,7,9.314,7,6H9c0,2.566,1.669,4,3,4s3-1.434,3-4h2C17,9.314,14.761,12,12,12Z" transform="translate(-2 -2)" fill="currentColor" fill-rule="evenodd"></path></svg>
+                            </a>
+                        </li>
+                        <li class="my-account">
+                            <a href="javascript:void(0)" aria-label="My account dropdown">
+                                @* <i class="flaticon-person"></i> *@
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="20px" viewBox="0 0 16.577 18.6"><path d="M-7722.37,2933a.63.63,0,0,1-.63-.63c0-4.424,2.837-6.862,7.989-6.862s7.989,2.438,7.989,6.862a.629.629,0,0,1-.63.63Zm.647-1.251h13.428c-.246-3.31-2.5-4.986-6.713-4.986s-6.471,1.673-6.714,4.986Zm2.564-12.518a4.1,4.1,0,0,1,1.172-3,4.1,4.1,0,0,1,2.979-1.229,4.1,4.1,0,0,1,2.979,1.229,4.1,4.1,0,0,1,1.171,3,4.341,4.341,0,0,1-4.149,4.5,4.344,4.344,0,0,1-4.16-4.5Zm1.251,0a3.1,3.1,0,0,0,2.9,3.254,3.094,3.094,0,0,0,2.9-3.253,2.878,2.878,0,0,0-.813-2.109,2.88,2.88,0,0,0-2.085-.872,2.843,2.843,0,0,0-2.1.856,2.841,2.841,0,0,0-.806,2.122Z" transform="translate(7723.3 -2914.703)" fill="currentColor" stroke="currentColor" stroke-width="0.6"></path></svg>
+                            </a>
+                            <div class="my-account-dropdown">
+                                @if (isAuthenticated)
+                                {
+                                    <span class="title">@SharedResources["Welcome"]: @userClaims?.Email</span>
+                                    <ul>
+                                        <li>
+                                            <a href="/">@SharedResources["My account"]</a>
+                                        </li>
+                                        <li>
+                                            <a href="/">@SharedResources["Orders"]</a>
+                                        </li>
+                                    </ul>
+                                    <div class="login-btn">
+                                        <a href="/account/Logout" class="axil-btn btn-bg-primary">@SharedResources["Sign out"]</a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="login-btn">
+                                        <a href="/account/login" class="axil-btn btn-bg-primary">@SharedResources["Sign In"]</a>
+                                    </div>
+                                    <div class="reg-footer text-center">@SharedResources["No account yet?"] <a href="/account/signup" class="btn-link">@SharedResources["Sign up"].</a></div>
+                                }
+                            </div>
+                        </li>
+                        <li class="axil-mobile-toggle">
+                            <button class="menu-btn mobile-nav-toggler" aria-label="Mobile toggle menu button">
+                                @* <i class="flaticon-menu-2"></i> *@
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                @* <svg xmlns="http://www.w3.org/2000/svg" width="22" height="14" viewBox="0 0 25.567 18"><g transform="translate(-776 -462)"><rect id="Rectangle_941" data-name="Rectangle 941" width="12.749" height="2.499" rx="1.25" transform="translate(776 462)" fill="currentColor"></rect><rect id="Rectangle_942" data-name="Rectangle 942" width="25.567" height="2.499" rx="1.25" transform="translate(776 469.75)" fill="currentColor"></rect><rect id="Rectangle_943" data-name="Rectangle 943" width="17.972" height="2.499" rx="1.25" transform="translate(776 477.501)" fill="currentColor"></rect></g></svg> *@
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Mainmenu Area  -->
+</header>

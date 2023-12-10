@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+	<PackageReference Include="ClosedXML" Version="0.102.1" />
+	<PackageReference Include="CsvHelper" Version="28.0.1" />
+	<PackageReference Include="Serilog.AspNetCore" Version="6.1.0-dev-00281" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Time.Commerce.Contracts\Time.Commerce.Contracts.csproj" />
+    <ProjectReference Include="..\Time.Commerce.Domains\Time.Commerce.Domains.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+  </ItemGroup>
+
+</Project>

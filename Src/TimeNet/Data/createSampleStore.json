@@ -1,0 +1,160 @@
+{
+  "Brands": [
+    {
+      "Name": "Shovia",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 1
+    },
+    {
+      "Name": "Fusion",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 2
+    },
+    {
+      "Name": "Fashadil",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 3
+    },
+    {
+      "Name": "Hunter Shoes",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 4
+    },
+    {
+      "Name": "Club Shoes",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 5
+    },
+    {
+      "Name": "Hoppister",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 6
+    },
+    {
+      "Name": "Blaze Fashion",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 7
+    },
+    {
+      "Name": "Elegance",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 8
+    }
+  ],
+  "Categories": [
+    {
+      "Name": "Man",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 1
+    },
+    {
+      "Name": "Watch",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 2
+    },
+    {
+      "Name": "Kids",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 3
+    },
+    {
+      "Name": "Sports",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 4
+    },
+    {
+      "Name": "Sunglass",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 5
+    },
+    {
+      "Name": "Bags",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 6
+    },
+    {
+      "Name": "Sneakers",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 7
+    },
+    {
+      "Name": "Woman",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "DisplayOrder": 8
+    }
+  ],
+  "Products": [
+    {
+      "Name": "Short Sleeve Shirts For Men",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 18,
+      "OldPrice": 24
+    },
+    {
+      "Name": "Blazer And A Neck Scarf",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 13,
+      "OldPrice": 21
+    },
+    {
+      "Name": "Hermes Carlton London",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 19,
+      "OldPrice": 0
+    },
+    {
+      "Name": "Maniac Blue Boys",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 17,
+      "OldPrice": 21
+    },
+    {
+      "Name": "Best Shoes 2022",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 54,
+      "OldPrice": 0
+    },
+    {
+      "Name": "Wayfarer Sunglasses",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 23,
+      "OldPrice": 27
+    },
+    {
+      "Name": "Tissot Classic",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 33,
+      "OldPrice": 0
+    },
+    {
+      "Name": "Classic Watch New 2022",
+      "ShowOnHomePage": true,
+      "Published": true,
+      "Price": 29,
+      "OldPrice": 37
+    }
+  ]
+}

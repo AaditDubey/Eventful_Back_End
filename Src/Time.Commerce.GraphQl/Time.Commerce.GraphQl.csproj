@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="GraphQL" Version="4.6.1" />
+	<PackageReference Include="GraphQL.MicrosoftDI" Version="4.6.1" />
+	<PackageReference Include="GraphQL.Server.Authorization.AspNetCore" Version="5.0.2" />
+	<PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
+	<PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.0.2" />
+	<PackageReference Include="GraphQL.Server.Ui.Playground" Version="6.0.0" />
+	<PackageReference Include="GraphQL.SystemTextJson" Version="4.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Time.Commerce.Infras\Time.Commerce.Infras.csproj" />
+  </ItemGroup>
+
+</Project>
